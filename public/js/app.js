@@ -55233,8 +55233,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "./resources/js/store.js");
 /* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./routes */ "./resources/js/routes.js");
 /* harmony import */ var _components_MainApp_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/MainApp.vue */ "./resources/js/components/MainApp.vue");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _helper_general__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helper/general */ "./resources/js/helper/general.js");
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
@@ -55251,22 +55250,7 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_2__["default"]({
   mode: "history"
 });
 var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store(_store__WEBPACK_IMPORTED_MODULE_3__["default"]);
-router.beforeEach(function (to, from, next) {
-  var requiresAuth = to.matched.some(function (record) {
-    return record.meta.requiresAuth;
-  });
-  var currentUser = store.state.currentUser; // when route requires auth and there's no current user, reidrect to '/login'
-
-  if (requiresAuth && !currentUser) {
-    next("/login"); // when we go to login route and are already logged in, we can skip this page
-    // so we redirect to the homepage
-  } else if (to.path == "/login" && currentUser) {
-    next("/"); // if none of the above matches, we have a normal navigation that should just go through
-    // so we call `next()`
-  } else {
-    next(); // you called `next('/')` which redirected to the homepage over and over again.
-  }
-});
+Object(_helper_general__WEBPACK_IMPORTED_MODULE_6__["initialize"])(store, router);
 var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   el: "#app",
   router: router,
@@ -55648,6 +55632,43 @@ function getLocalUser() {
   }
 
   return JSON.parse(userStr);
+}
+
+/***/ }),
+
+/***/ "./resources/js/helper/general.js":
+/*!****************************************!*\
+  !*** ./resources/js/helper/general.js ***!
+  \****************************************/
+/*! exports provided: initialize */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialize", function() { return initialize; });
+function initialize(store, router) {
+  router.beforeEach(function (to, from, next) {
+    var requiresAuth = to.matched.some(function (record) {
+      return record.meta.requiresAuth;
+    });
+    var currentUser = store.state.currentUser; // when route requires auth and there's no current user, reidrect to '/login'
+
+    if (requiresAuth && !currentUser) {
+      next("/login"); // when we go to login route and are already logged in, we can skip this page
+      // so we redirect to the homepage
+    } else if (to.path == "/login" && currentUser) {
+      next("/"); // if none of the above matches, we have a normal navigation that should just go through
+      // so we call `next()`
+    } else {
+      next(); // you called `next('/')` which redirected to the homepage over and over again.
+    }
+  });
+  axios.interceptors.response.use(null, function () {
+    if (error.response.status == 401) {
+      store.commit("logout");
+      router.push("/login");
+    }
+  });
 }
 
 /***/ }),
