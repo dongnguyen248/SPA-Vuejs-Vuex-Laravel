@@ -23,7 +23,7 @@ export default {
             return state.auth_error;
         },
         customers(state) {
-            return state.auth_error;
+            return state.customers;
         }
     },
     mutations: {
