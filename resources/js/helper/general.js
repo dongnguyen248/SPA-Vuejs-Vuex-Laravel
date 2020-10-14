@@ -17,10 +17,7 @@ export function initialize(store, router) {
             next(); // you called `next('/')` which redirected to the homepage over and over again.
         }
     });
-    axios.interceptors.response.use(null, () => {
-        if (error.response.status == 401) {
-            store.commit("logout");
-            router.push("/login");
-        }
-    });
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters.currentUser.token}`;
+
 }

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { getLocalUser } from "./helper/auth";
 
 const user = getLocalUser();
@@ -48,11 +49,19 @@ export default {
             localStorage.removeItem("user");
             state.isLoginedIn = false;
             state.currentUser = null;
+        },
+        updateCustomer(state, payload) {
+            state.customers = payload;
         }
     },
     actions: {
         login(context) {
             context.commit("login");
+        },
+        getCustomers(context) {
+            axios.get('/api/customers').then((response) => {
+                context.commit('updateCustomer', response.data.customers);
+            })
         }
     }
 };

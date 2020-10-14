@@ -8,11 +8,13 @@ import storeData from "./store";
 import { routes } from "./routes";
 import MaintApp from "./components/MainApp.vue";
 import { initialize } from "./helper/general";
+// import * as VeeValidate from "vee-validate";
+// Vue.use(VeeValidate, { errorBagName: "vErrors" });
 
 Vue.use(VueRouter);
 const router = new VueRouter({
     routes,
-    mode: "history",
+    mode: "history"
 });
 const store = new Vuex.Store(storeData);
 initialize(store, router);
@@ -22,6 +24,6 @@ const app = new Vue({
     router,
     store,
     components: {
-        MaintApp,
-    },
+        MaintApp
+    }
 });
