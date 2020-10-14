@@ -9,9 +9,7 @@ import Register from "./components/auth/Register.vue";
 const routes = [{
         path: "/",
         component: Home,
-        meta: {
-            requiresAuth: true
-        }
+
     },
     {
         path: "/login",

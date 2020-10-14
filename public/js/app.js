@@ -2224,7 +2224,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       this.errors = null;
-      var constraints = this.getConstraints();
+      var constraints = this.getConstraints(); // const errorsconfpass = validate({password,confpassword},{confirmPassword: { equality: "password" } })
+
       var errors = validate_js__WEBPACK_IMPORTED_MODULE_0___default()(this.$data.user, constraints);
 
       if (errors) {
@@ -2255,16 +2256,13 @@ __webpack_require__.r(__webpack_exports__);
         password: {
           length: {
             minimum: 8,
-            message: "password must be at least 6 characters long"
+            message: "must be at least 6 characters long"
           }
         },
-        confpassowrd: {
+        confpassword: {
           equality: {
             attribute: "password",
-            message: "Passwords do not match",
-            comparator: function comparator(v1) {
-              return v1.confpassword === v1.password;
-            }
+            message: "do not match"
           }
         }
       };
@@ -2469,7 +2467,11 @@ __webpack_require__.r(__webpack_exports__);
         return this.errors = errors;
       }
 
-      axios.post("/api/customers/new", this.$data.customer).then(function (response) {
+      axios.post("/api/customers/new", this.$data.customer, {
+        headers: {
+          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
+        }
+      }).then(function (response) {
         _this.$router.push("/customers");
       });
     },
@@ -2564,7 +2566,11 @@ __webpack_require__.r(__webpack_exports__);
         return customer.id == _this.$route.params.id;
       });
     } else {
-      axios.get("../api/customers/".concat(this.$route.params.id)).then(function (response) {
+      axios.get("../api/customers/".concat(this.$route.params.id), {
+        headers: {
+          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
+        }
+      }).then(function (response) {
         _this.customer = response.data.customer;
       });
     }
@@ -57753,8 +57759,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 
 
- // import * as VeeValidate from "vee-validate";
-// Vue.use(VeeValidate, { errorBagName: "vErrors" });
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_2__["default"]);
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_2__["default"]({
@@ -58583,6 +58587,7 @@ function initialize(store, router) {
     var currentUser = store.state.currentUser; // when route requires auth and there's no current user, reidrect to '/login'
 
     if (requiresAuth && !currentUser) {
+      console.log('aa');
       next("/login"); // when we go to login route and are already logged in, we can skip this page
       // so we redirect to the homepage
     } else if (to.path == "/login" && currentUser) {
@@ -58592,7 +58597,14 @@ function initialize(store, router) {
       next(); // you called `next('/')` which redirected to the homepage over and over again.
     }
   });
-  axios.defaults.headers.common['Authorization'] = "Bearer ".concat(store.getters.currentUser.token);
+  axios.interceptors.response.use(null, function (error) {
+    if (error.response.status == 401) {
+      store.commit('logout');
+      router.push('.login');
+    }
+
+    return Promise.reject(error);
+  }); // axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters.currentUser.token}`;
 }
 
 /***/ }),
@@ -58623,10 +58635,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var routes = [{
   path: "/",
-  component: _components_Home_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-  meta: {
-    requiresAuth: true
-  }
+  component: _components_Home_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
 }, {
   path: "/login",
   component: _components_auth_Login_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -58726,7 +58735,11 @@ var user = Object(_helper_auth__WEBPACK_IMPORTED_MODULE_1__["getLocalUser"])();
       context.commit("login");
     },
     getCustomers: function getCustomers(context) {
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/customers').then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/customers', {
+        headers: {
+          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
+        }
+      }).then(function (response) {
         context.commit('updateCustomer', response.data.customers);
       });
     }

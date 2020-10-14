@@ -1,11 +1,17 @@
 export function initialize(store, router) {
+
+
     router.beforeEach((to, from, next) => {
+
         const requiresAuth = to.matched.some(
             record => record.meta.requiresAuth
         );
+
         const currentUser = store.state.currentUser;
+
         // when route requires auth and there's no current user, reidrect to '/login'
         if (requiresAuth && !currentUser) {
+            console.log('aa')
             next("/login");
             // when we go to login route and are already logged in, we can skip this page
             // so we redirect to the homepage
@@ -18,6 +24,14 @@ export function initialize(store, router) {
         }
     });
 
-    axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters.currentUser.token}`;
+    axios.interceptors.response.use(null, (error) => {
+        if (error.response.status == 401) {
+            store.commit('logout');
+            router.push('.login');
+        }
+        return Promise.reject(error);
+    });
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters.currentUser.token}`;
+
 
 }

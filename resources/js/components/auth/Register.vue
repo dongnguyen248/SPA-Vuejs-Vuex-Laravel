@@ -82,6 +82,7 @@ export default {
     register() {
       this.errors = null;
       const constraints = this.getConstraints();
+      // const errorsconfpass = validate({password,confpassword},{confirmPassword: { equality: "password" } })
       const errors = validate(this.$data.user, constraints);
       if (errors) {
         return (this.errors = errors);
@@ -112,16 +113,13 @@ export default {
         password: {
           length: {
             minimum: 8,
-            message: "password must be at least 6 characters long",
+            message: "must be at least 6 characters long",
           },
         },
-        confpassowrd: {
+        confpassword: {
           equality: {
             attribute: "password",
-            message: "Passwords do not match",
-            comparator: function (v1) {
-              return v1.confpassword === v1.password;
-            },
+            message: "do not match",
           },
         },
       };
