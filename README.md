@@ -7,7 +7,7 @@ Tut link : [here](https://www.youtube.com/watch?v=Jd1RW-0lQOs&list=PLJpBh2VJhy5w
 ## Install
 
 -   Clone project
--   composer require
+-   composer install
 -   npm install
 -   php artisan jwt:secret
 -   edit .env.example to .env and config your database
