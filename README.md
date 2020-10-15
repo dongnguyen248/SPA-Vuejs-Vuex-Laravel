@@ -9,6 +9,7 @@ Tut link : [here](https://www.youtube.com/watch?v=Jd1RW-0lQOs&list=PLJpBh2VJhy5w
 -   Clone project
 -   composer install
 -   npm install
+-   php artisan key:generate
 -   php artisan jwt:secret
 -   edit .env.example to .env and config your database
 -   php artisan migrate
