@@ -59,13 +59,9 @@ export default {
             context.commit("login");
         },
         getCustomers(context) {
-            axios.get('/api/customers', {
-                headers: {
-                    Authorization: `Bearer ${this.$store.getters.currentUser.token}`,
-                },
-            }).then((response) => {
-                context.commit('updateCustomer', response.data.customers);
-            })
+            axios.get("/api/customers").then(response => {
+                context.commit("updateCustomer", response.data.customers);
+            });
         }
     }
 };

@@ -43,7 +43,6 @@ class RegisterController extends Controller
     }
     public function register(Request $request)
     {
-        // dd($request);
         $v = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
             'password'  => 'required|min:3',

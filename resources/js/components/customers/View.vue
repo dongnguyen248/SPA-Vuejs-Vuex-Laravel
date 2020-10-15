@@ -48,11 +48,7 @@ export default {
       );
     } else {
       axios
-        .get(`../api/customers/${this.$route.params.id}`, {
-          headers: {
-            Authorization: `Bearer ${this.$store.getters.currentUser.token}`,
-          },
-        })
+        .get(`../api/customers/${this.$route.params.id}`)
         .then((response) => {
           this.customer = response.data.customer;
         });

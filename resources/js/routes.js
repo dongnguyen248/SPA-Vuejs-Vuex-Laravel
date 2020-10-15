@@ -23,7 +23,7 @@ const routes = [{
         path: "/customers",
         component: CustomersMain,
         meta: {
-            requiresAuth: true
+            requiresAuth: true //the route need authen -> need add meta
         },
         children: [{
                 path: "/",

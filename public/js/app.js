@@ -2467,11 +2467,7 @@ __webpack_require__.r(__webpack_exports__);
         return this.errors = errors;
       }
 
-      axios.post("/api/customers/new", this.$data.customer, {
-        headers: {
-          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
-        }
-      }).then(function (response) {
+      axios.post("/api/customers/new", this.$data.customer).then(function (response) {
         _this.$router.push("/customers");
       });
     },
@@ -2566,11 +2562,7 @@ __webpack_require__.r(__webpack_exports__);
         return customer.id == _this.$route.params.id;
       });
     } else {
-      axios.get("../api/customers/".concat(this.$route.params.id), {
-        headers: {
-          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
-        }
-      }).then(function (response) {
+      axios.get("../api/customers/".concat(this.$route.params.id)).then(function (response) {
         _this.customer = response.data.customer;
       });
     }
@@ -58545,12 +58537,12 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "login", function() { return login; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getLocalUser", function() { return getLocalUser; });
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _general__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./general */ "./resources/js/helper/general.js");
 
 function login(credentials) {
   return new Promise(function (res, rej) {
-    axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("api/auth/login", credentials).then(function (response) {
+    axios.post("/api/auth/login", credentials).then(function (response) {
+      Object(_general__WEBPACK_IMPORTED_MODULE_0__["setAuthorization"])(response.data.access_token);
       res(response.data);
     })["catch"](function (err) {
       rej("Wrong email or password");
@@ -58573,38 +58565,43 @@ function getLocalUser() {
 /*!****************************************!*\
   !*** ./resources/js/helper/general.js ***!
   \****************************************/
-/*! exports provided: initialize */
+/*! exports provided: initialize, setAuthorization */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialize", function() { return initialize; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setAuthorization", function() { return setAuthorization; });
 function initialize(store, router) {
   router.beforeEach(function (to, from, next) {
     var requiresAuth = to.matched.some(function (record) {
       return record.meta.requiresAuth;
     });
-    var currentUser = store.state.currentUser; // when route requires auth and there's no current user, reidrect to '/login'
+    var currentUser = store.state.currentUser;
 
     if (requiresAuth && !currentUser) {
-      console.log('aa');
-      next("/login"); // when we go to login route and are already logged in, we can skip this page
-      // so we redirect to the homepage
+      next("/login");
     } else if (to.path == "/login" && currentUser) {
-      next("/"); // if none of the above matches, we have a normal navigation that should just go through
-      // so we call `next()`
+      next("/");
     } else {
-      next(); // you called `next('/')` which redirected to the homepage over and over again.
+      next();
     }
   });
   axios.interceptors.response.use(null, function (error) {
-    if (error.response.status == 401) {
-      store.commit('logout');
-      router.push('.login');
+    if (error.resposne.status == 401) {
+      store.commit("logout");
+      router.push("/login");
     }
 
     return Promise.reject(error);
-  }); // axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters.currentUser.token}`;
+  });
+
+  if (store.getters.currentUser) {
+    setAuthorization(store.getters.currentUser.token);
+  }
+}
+function setAuthorization(token) {
+  axios.defaults.headers.common["Authorization"] = "Bearer ".concat(token);
 }
 
 /***/ }),
@@ -58646,7 +58643,8 @@ var routes = [{
   path: "/customers",
   component: _components_customers_Main_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
   meta: {
-    requiresAuth: true
+    requiresAuth: true //the route need authen -> need add meta
+
   },
   children: [{
     path: "/",
@@ -58735,12 +58733,8 @@ var user = Object(_helper_auth__WEBPACK_IMPORTED_MODULE_1__["getLocalUser"])();
       context.commit("login");
     },
     getCustomers: function getCustomers(context) {
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/customers', {
-        headers: {
-          Authorization: "Bearer ".concat(this.$store.getters.currentUser.token)
-        }
-      }).then(function (response) {
-        context.commit('updateCustomer', response.data.customers);
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/customers").then(function (response) {
+        context.commit("updateCustomer", response.data.customers);
       });
     }
   }
